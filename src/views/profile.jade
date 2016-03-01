@@ -1,0 +1,57 @@
+doctype
+html
+    head
+        title My Profile
+        include mixins
+        
+        //- Bootswatch Theme
+        +bootswatch("flatly")
+        
+        script( src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js' )
+        script( src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js' )
+        
+        +nav("Blog Application", "dropdown_menu")
+            +nav_item_dropdown( "#" )( label="Check")
+                +nav_item( '/users/' + userId) Your Profile
+                +nav_item( '/users/' + userId + '/posts') Your Posts
+                +nav_item( '/users/' + userId + '/allposts') All Posts
+            +nav_item( "/logout" ) Log out
+ 
+    body(style="padding-bottom:10rem;")
+      .container
+
+      .jumbotron
+        h1= 'Hey ' + user.name + '! What\'s up today?'
+
+      .row
+      .col-md-4.col-sm-6.col-xs-12
+        +panel("Your Details:", "primary")
+          p= 'Your name: ' + user.name
+          br
+          p= 'Your email: ' + user.email
+          br
+          p= 'Your userID: ' + user.id
+          br
+          a.btn.btn-primary( href='/logout') Log out
+      .col-md-4.col-sm-6.col-xs-12
+        +panel("Tell my your story", "primary")
+          form(action='/users/createpost' method='post' id="createpost")
+            label <strong>Title: </strong>
+            br
+            input(name='title')
+            br
+            br
+            label <strong> Content:</strong>
+            br
+            textarea(rows='4', cols='.col-md-4.col-sm-6.col-xs-12', name='content', form='createpost')
+            br
+            br
+            input.btn.btn-primary(type='submit', value='Create post')
+      .col-md-4.col-sm-6.col-xs-12
+        +panel("Check your post(s)", "primary")
+          p  Check all your posts and read the comments!
+          a.btn.btn-primary( href='/users/' + userId + '/posts') Check your posts!
+      .col-md-4.col-sm-6.col-xs-12
+        +panel("All posts", "primary")
+          p  Do you want to check all the posts?
+          a.btn.btn-primary( href='/users/' + userId + '/allposts') Check all posts!

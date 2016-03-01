@@ -1,0 +1,35 @@
+doctype
+html
+    head
+        title My Profile
+        include mixins
+        
+        //- Bootswatch Theme
+        +bootswatch("flatly")
+        
+        script( src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js' )
+        script( src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js' )
+        
+        +nav("Blog Application", "dropdown_menu")
+            +nav_item_dropdown( "#" )( label="Check")
+                +nav_item( '/users/' + userId) Your Profile
+                +nav_item( '/users/' + userId + '/posts') Your Posts
+                +nav_item( '/users/' + userId + '/allposts') All Posts
+            +nav_item( "/logout" ) Log out
+ 
+    body(style="padding-bottom:10rem;")
+      .container
+
+      .jumbotron
+        h1 Check the post(s)!
+
+      .row
+      each val in data
+        .col-md-4.col-sm-4.col-xs-12
+          +panel('Title: ' + val.title,'primary')
+            p=val.content
+            br
+            p <strong>Written by:</strong>
+            p=val.author
+            br
+            a( href='/users/' + userId + '/post/' + val.id) Open post

@@ -1,0 +1,50 @@
+doctype
+html
+    head
+        title Check your post!
+        include mixins
+        
+        //- Bootswatch Theme
+        +bootswatch("flatly")
+        
+        script( src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js' )
+        script( src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js' )
+        
+        +nav("Blog Application", "dropdown_menu")
+            +nav_item_dropdown( "#" )( label="Check")
+                +nav_item( '/users/' + userId) Your Profile
+                +nav_item( '/users/' + userId + '/posts') Your Posts
+                +nav_item( '/users/' + userId + '/allposts') All Posts
+            +nav_item( "/logout" ) Log out
+ 
+    body(style="padding-bottom:10rem;")
+      .container
+
+      .jumbotron
+        h1 Check your post!
+
+      .row
+      each val in post
+            .col-md-4.col-sm-6.col-xs-12
+              +panel('Title: ' + val.title,'primary')
+                p=val.content
+                br
+                p <strong>Written by:</strong>
+                p=val.author
+                each val, index in comment
+                    if index == 0
+                      br
+                      p <strong>Comments:</strong>
+                    if val !== null
+                      p=val.author + ' commented on this: '
+                      p=val.title
+                      br
+            .col-md-4.col-sm-6.col-xs-12
+              +panel("Leave a comment", "primary")
+                form(action='/users/' + userId + '/post/' + postId + '/createcomment' method='post' id="createcomment")
+                  label <strong>Comment: </strong>
+                  br
+                  input(name='title')
+                  br
+                  br
+                  input.btn.btn-primary(type='submit', value='Submit')

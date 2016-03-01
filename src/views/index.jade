@@ -1,0 +1,81 @@
+doctype
+html
+    head
+        title Home Page
+        include mixins
+        
+        //- Bootswatch Theme
+        +bootswatch("flatly")
+        
+        script( src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js' )
+        script( src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js' )
+        
+      if userId !== undefined
+        +nav("Blog Application", "dropdown_menu")
+            +nav_item_dropdown( "#" )( label="Check")
+                +nav_item( '/users/' + userId) Your Profile
+                +nav_item( '/users/' + userId + '/posts') Your Posts
+                +nav_item( '/users/' + userId + '/allposts') All Posts
+            +nav_item( "/logout" ) Log out
+ 
+    body(style="padding-bottom:10rem;")
+        .container
+        
+        .jumbotron
+            #textJumbotron: h1 Welcome to my blog application!
+            #textJumbotron: p Join the blogging community. It's easy. It's free.
+
+        .row
+        .col-md-4.col-sm-6.col-xs-12
+                +panel("Login", "primary")
+                    form(action='/login', method='post')
+                            | What is your email? &nbsp;
+                            input(type='text', name='email')
+                            br
+                            br
+                            | What is your password? &nbsp;
+                            input(type='password', name='password')
+                            br
+                            br
+                            if logout
+                                +alert('success')
+                                    p=logout
+                            if errorpassword
+                                +alert('danger')
+                                    p=errorpassword
+                            if erroremail
+                                +alert('danger')
+                                    p=erroremail
+                            if errorempty
+                                +alert('danger')
+                                    p=errorempty
+                            input.a.btn.btn-primary(type='submit', value="Login")
+            .col-md-4.col-sm-6.col-xs-12
+                +panel("Register new account", "primary")
+                    form(action='/users', method='post')
+                        | What is your name? &nbsp;
+                        input(type='text', name='name')
+                        br
+                        br
+                        | What is your email? &nbsp;
+                        input(type='text', name='email')
+                        br
+                        br
+                        | What is your password? &nbsp;
+                        input(type='password', name='password')
+                        br
+                        br
+                        if succesregister
+                            +alert('success')
+                                p=succesregister
+                        if errorregister
+                            +alert('danger')
+                                p=errorregister
+                        input.a.btn.btn-primary(type='submit', value="Create new user")
+            style.
+                #postButton{
+                margin-left: 15px;
+                }
+                #textJumbotron{
+                margin-left: 15px;
+                }
