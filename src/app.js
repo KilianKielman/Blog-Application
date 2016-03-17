@@ -1,3 +1,6 @@
+var fs = require('fs');
+var bcrypt = require('bcrypt');
+
 var Sequelize = require('sequelize');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -19,12 +22,14 @@ app.use(session({
 }));
 
 var sequelize = new Sequelize('my_blog_application', process.env.PSQL_USERNAME, process.env.PSQL_PASSWORD, {
-    host: 'localhost',
-    dialect: 'postgres',
-    define: {
-        timestamps: false
-    }
+	host: 'localhost',
+	dialect: 'postgres',
+	define: {
+		timestamps: false
+	}
 });
+
+//
 
 //this defines the new table user in sequalize
 var User = sequelize.define('user', {
@@ -63,13 +68,15 @@ app.post('/users', function(request, response) {
 	var checkEmail = request.body.email;
 
 	if (checkUsername !== "" && checkPassword !== "" && checkEmail !== "") {
-		User.create({
-			name: request.body.name,
-			email: request.body.email,
-			password: request.body.password
-		}).then(function(user) {
-			response.render('index', {
-				succesregister: "You've succesfully created your account!"
+		bcrypt.hash(checkPassword, 8, function(err, hash) {
+			User.create({
+				name: request.body.name,
+				email: request.body.email,
+				password: hash
+			}).then(function(user) {
+				response.render('index', {
+					succesregister: "You've succesfully created your account!"
+				});
 			});
 		});
 	} else {
@@ -79,7 +86,8 @@ app.post('/users', function(request, response) {
 	}
 });
 
-//this is the post request to login
+
+// this is the post request to login
 app.post('/login', function(request, response) {
 	var checkEmail = request.body.email;
 	var checkPassword = request.body.password;
@@ -92,14 +100,17 @@ app.post('/login', function(request, response) {
 			})
 			.then(function(user) {
 				if (user !== null) {
-					if (request.body.password === user.password) {
+					bcrypt.compare(checkPassword, user.password, function(err, res) {
 						request.session.user = user;
-						response.redirect('/users/' + user.id);
-					} else {
-						response.render('index', {
-							errorpassword: "Invalid password"
-						});
-					}
+						if (res === true) {
+							response.redirect('/users/' + user.id);
+						}
+						if (res === false) {
+							response.render('index', {
+								errorpassword: "Invalid password"
+							});
+						}
+					})
 				} else {
 					response.render('index', {
 						erroremail: "Invalid emailaddress"
@@ -111,7 +122,7 @@ app.post('/login', function(request, response) {
 			errorempty: "Please fill out form"
 		});
 	}
-});
+})
 
 //the user gets send to this dynamic route, once logged in
 app.get('/users/:id', function(request, response) {
@@ -210,21 +221,21 @@ app.get('/users/:id/post/:ip', function(request, response) {
 			};
 		})
 		var post = result[1].map(function(post) {
-				return {
-					id: post.dataValues.id,
-					author: post.dataValues.author,
-					userid: post.dataValues.userid,
-					title: post.dataValues.title,
-					content: post.dataValues.content
-				};
-			});
+			return {
+				id: post.dataValues.id,
+				author: post.dataValues.author,
+				userid: post.dataValues.userid,
+				title: post.dataValues.title,
+				content: post.dataValues.content
+			};
+		});
 
 		response.render('users/post', {
-				post: post,
-				comment: comment,
-				userId: request.session.user.id,
-				postId: request.params.ip
-			});
+			post: post,
+			comment: comment,
+			userId: request.session.user.id,
+			postId: request.params.ip
+		});
 	});
 });
 
@@ -257,7 +268,9 @@ app.get('/logout', function(request, response) {
 	})
 });
 
-sequelize.sync().then(function() {
+sequelize.sync({
+	force: true
+}).then(function() {
 	var server = app.listen(3000, function() {
 		console.log('Example app listening on port: ' + server.address().port);
 	});
